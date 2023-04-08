@@ -11,7 +11,20 @@ namespace pri {
 
            internal static (bool, int) select_ip_addrs (  ) {
               IPHostEntry ihe = Dns.GetHostEntry(Dns.GetHostName()); 
-            
+      
+              write("ip list: ", color.mag); 
+              for (int i = 0; i < ihe.AddressList.Length; i++) 
+              {
+                 write(" ["+i+"] "+ihe.AddressList[i], color.ag); 
+              }
+           }
+
+           internal static void select_ip ( ) 
+           {
+              while(true) 
+              {
+                
+              }
            }
     
            internal static void write(string msg, ConsoleColor c) 
@@ -39,6 +52,25 @@ namespace pri {
           
            public static void reset( ) {
               Console.ForegroundColor = white; 
+           }
+        }
+
+        public struct _NET_PARAM { 
+           public int  BUFFER_LEN;
+           public int  SERVER_PORT;
+           public int  MAX_CONN;
+           public int  SEL;
+           public bool IS_IP_SET; 
+           public bool IS_PORT_SET; 
+
+           public _NET_PARAM( ) 
+           {
+              BUFFER_LEN  = 8042;
+              SERVER_PORT = 23;
+              MAX_CONN    = 24;
+              SEL         = 0;
+              IS_IP_SET   = false;
+              IS_PORT_SET = false; 
            }
         }
      }
