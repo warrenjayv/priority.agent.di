@@ -7,6 +7,8 @@ namespace pri {
   namespace net {
      namespace station {
         public class server {
+            
+           _NET_PARAM _NP   = new _NET_PARAM( ); 
            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName( )); 
 
            internal static (bool, int) select_ip_addrs (  ) {
@@ -23,7 +25,10 @@ namespace pri {
            {
               while(true) 
               {
-                
+                try {
+                   write("please select an ip <index>", color.mag); 
+                   
+                }
               }
            }
     
