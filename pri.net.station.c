@@ -3,6 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
+using pri.net.station;
+
 namespace pri {
   namespace net {
      namespace station {
@@ -11,8 +13,30 @@ namespace pri {
            _NET_PARAM _NP   = new _NET_PARAM( ); 
            IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName( )); 
 
-           internal static (bool, int) select_ip_addrs (  ) {
-              IPHostEntry ihe = Dns.GetHostEntry(Dns.GetHostName()); 
+           public static void service ( ) {
+              (bool status, int index) stat = select_ip_addrs ( host ); 
+              if(! stat.status ) 
+              {
+                printer.write("ERROR: no error network devices found!", color.red); 
+              }
+              
+              IPAddress  _ipaddr = host.addressList[stat.index];
+              IPEndPoint _iep    = new IPEndPoint(_ipaddr, _NP.SERVER_PORT); 
+              Socket     _rs     = new socket
+                                   (
+                                         ipaddr.AddressFamily,
+                                         SocketType.Stream,
+                                         ProtocolType.Tcp
+                                   ); 
+              try {
+                _rs.Bind(iep); 
+                _rs.Listen(_NP.MAX_CONN); 
+        
+              }
+
+           }
+
+           internal static (bool, int) select_ip_addrs (IPHostEntry ihe) {
       
               write("ip list: ", color.mag); 
               for (int i = 0; i < ihe.AddressList.Length; i++) 
@@ -32,34 +56,7 @@ namespace pri {
               }
            }
     
-           internal static void write(string msg, ConsoleColor c) 
-           {
-              color.set(c); 
-              Console.WriteLine(msg);
-              color.set(color.white);
-           }
         } 
-
-        public static class color {
-           public static ConsoleColor red     = ConsoleColor.Red;
-           public static ConsoleColor blue    = ConsoleColor.Blue;
-           public static ConsoleColor yellow  = ConsoleColor.Yellow;
-           public static ConsoleColor white   = ConsoleColor.White;
-           public static ConsoleColor green   = ConsoleColor.Green;
-           public static ConsoleColor mag     = ConsoleColor.Magenta;
-           public static ConsoleColor cyan    = ConsoleColor.Cyan;
-           public static ConsoleColor gray    = ConsoleColor.Gray;
-           public static ConsoleColor darkmag = ConsoleColor.DarkMagenta;
-
-           public static void set( ConsoleColor c ) {
-              Console.ForegroundColor = c;
-           }
-          
-           public static void reset( ) {
-              Console.ForegroundColor = white; 
-           }
-        }
-
         public struct _NET_PARAM { 
            public int  BUFFER_LEN;
            public int  SERVER_PORT;
