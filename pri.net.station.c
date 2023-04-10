@@ -3,15 +3,15 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-using pri.net.station;
+using pri.net.report;
 
 namespace pri {
   namespace net {
      namespace station {
         public class server {
             
-           _NET_PARAM _NP   = new _NET_PARAM( ); 
-           IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName( )); 
+           static _NET_PARAM _NP   = new _NET_PARAM( 8042, 23, 24 ); 
+           static IPHostEntry host = Dns.GetHostEntry(Dns.GetHostName( )); 
 
            public static void service ( ) {
               (bool status, int index) stat = select_ip_addrs ( host ); 
@@ -20,29 +20,35 @@ namespace pri {
                 printer.write("ERROR: no error network devices found!", color.red); 
               }
               
-              IPAddress  _ipaddr = host.addressList[stat.index];
+              IPAddress  _ipaddr = host.AddressList[stat.index];
               IPEndPoint _iep    = new IPEndPoint(_ipaddr, _NP.SERVER_PORT); 
-              Socket     _rs     = new socket
+              Socket     _rs     = new Socket
                                    (
-                                         ipaddr.AddressFamily,
+                                         _ipaddr.AddressFamily,
                                          SocketType.Stream,
                                          ProtocolType.Tcp
                                    ); 
-              try {
-                _rs.Bind(iep); 
+              try 
+              {
+                _rs.Bind(_iep); 
                 _rs.Listen(_NP.MAX_CONN); 
         
+              }
+              catch ( Exception e )
+              {
+                 printer.write(e.ToString( ), color.red);   
               }
 
            }
 
            internal static (bool, int) select_ip_addrs (IPHostEntry ihe) {
       
-              write("ip list: ", color.mag); 
+              printer.write("ip list: ", color.mag); 
               for (int i = 0; i < ihe.AddressList.Length; i++) 
               {
-                 write(" ["+i+"] "+ihe.AddressList[i], color.ag); 
+                 printer.write(" ["+i+"] "+ihe.AddressList[i], color.mag); 
               }
+
            }
 
            internal static void select_ip ( ) 
@@ -50,13 +56,23 @@ namespace pri {
               while(true) 
               {
                 try {
-                   write("please select an ip <index>", color.mag); 
+                   printer.write("please select an ip <index>", color.mag); 
                    
+                }
+                catch (InvalidSelectionException e) 
+                {
+
+                }
+                catch (Exception e) 
+                {
+
+
                 }
               }
            }
     
-        } 
+        }
+ 
         public struct _NET_PARAM { 
            public int  BUFFER_LEN;
            public int  SERVER_PORT;
@@ -65,15 +81,20 @@ namespace pri {
            public bool IS_IP_SET; 
            public bool IS_PORT_SET; 
 
-           public _NET_PARAM( ) 
+           public _NET_PARAM(int _BUFFER_LEN, int _SERVER_PORT, int _MAX_CONN ) 
            {
-              BUFFER_LEN  = 8042;
-              SERVER_PORT = 23;
-              MAX_CONN    = 24;
+              BUFFER_LEN  = _BUFFER_LEN;
+              SERVER_PORT = _SERVER_PORT;
+              MAX_CONN    = _MAX_CONN;
               SEL         = 0;
               IS_IP_SET   = false;
               IS_PORT_SET = false; 
            }
+        }
+
+        public class InvalidSelectionException : Exception 
+        {
+          public InvalidSelectionException( ) { printer.write("selection out of range. try again.", color.red ); }
         }
      }
   }
